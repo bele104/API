@@ -1,12 +1,14 @@
 import requests
 
 
-def feth_data(endpoint):
-    data=requests.get(f"https://rickandmortyapi.com/api/{endpoint}")
+def feth_data(topicos,filtros={}):
+
+    URL=f"https://rickandmortyapi.com/api/{topicos}"
+    data=requests.get(URL, params=filtros)
 
     if data.status_code == 200:
         return data.json()
     else :
         return print("LABA LABA DOOOOOO!!!!!!!!!!!!!!!!!!!!!!!")
 
-print(feth_data("episode"))
+print(feth_data("character",{'name':'Rick'}))
