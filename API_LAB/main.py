@@ -10,19 +10,19 @@ def fetch_data(topicos,filtros={}):
         resposta.raise_for_status()
         return resposta.json()
     except requests.exceptions.HTTPError as erro_http:
-            print("Erro HTTP:", erro_http)
-            return None
-    except Exception as e:
-            print("Erro inesperado:", e)
-            return None
+        print("Erro HTTP:", erro_http)
+        return None
 
- 
-data=fetch_data("character",{'name':'Rick'})
-print("LABA LABA DOOOOOO!!!!!!!!!!!!!!!!!!!!!!!" )
-dataRick=sqlite3.connect("DataRick.db")
-controleData=dataRick.cursor()
-# Cria a tabela
-controleData.execute("""
+    except Exception as e:
+        print("Erro inesperado:", e)
+        return None
+
+
+
+def criarTabela(controleData):
+
+    # Cria a tabela
+    controleData.execute("""
          CREATE TABLE IF NOT EXISTS ricks (
         id INTEGER PRIMARY KEY,
         nome TEXT,
@@ -31,9 +31,10 @@ controleData.execute("""
         origem TEXT,
         imagem TEXT
     )
-""")
-if data:
-    for personagem in data["results"]:
+    """)
+   
+def inserirData(controleData, data, dataRick):
+     for personagem in data["results"]:
         id_ = personagem["id"]
         nome = personagem["name"]
         status = personagem["status"]
@@ -47,8 +48,39 @@ if data:
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (id_, nome, status, especie, origem, imagem))
 
+
+
+def abrirEfechar (dataRick):
     dataRick.commit()
     print("Ricks inseridos no banco com sucesso!")
 
     # Fecha conexão
     dataRick.close()
+
+
+
+def bancoConecta(banco="DataRick.db"):
+    dataRick=sqlite3.connect(banco)
+    controleData=dataRick.cursor()
+    return dataRick, controleData
+
+
+def main():
+
+    print("LABA LABA DOOOOOO!!!!!!!!!!!!!!!!!!!!!!!" )
+    data=fetch_data("character",{'name':'Beth'})
+    if data:
+         dataRick, controleData =bancoConecta()
+         criarTabela(controleData)
+         inserirData(controleData,data,dataRick)
+         abrirEfechar (dataRick)
+         print(data)
+    else: 
+        print("erro")  
+
+
+# Executa o código
+if __name__ == "__main__":
+    main()
+
+    
